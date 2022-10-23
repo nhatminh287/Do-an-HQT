@@ -326,3 +326,43 @@ values('chinhanh01',N'Tam Mao',N'333 Cao Thắng Quận 10 HCM','07:00','20:00',
 insert into DonHang
 values('dohang01','abc','0987654321','123 nguyễn văn cừ quận 5 hcm','20221022',10000,15000,'dang van chuyen','kh01','tx01')
 
+-- Phân quyền
+use ESHOPPING
+-- Phân hệ đối tác
+create login DoiTac with PASSWORD = 'mk123'
+create user DoiTac for login DoiTac
+USE ESHOPPING grant select on Hopdong to DoiTac
+USE ESHOPPING grant select, insert, update on ChiNhanh to DoiTac
+USE ESHOPPING grant select, insert, delete, update on ThucDon to DoiTac
+use ESHOPPING grant select, update on DonHang to DoiTac
+USE ESHOPPING grant select on ChiTietDonHang to DoiTac
+
+-- Phân hệ khách hàng
+create login KhachHang with PASSWORD = 'mk1234'
+create user KhachHang for login KhachHang
+grant select on DoiTac to KhachHang
+grant select on ThucDon to KhachHang
+--Theo dõi đơn hàng
+grant select on DonHang to KhachHang
+
+-- Phân hệ tài xế
+create login TaiXe with PASSWORD = 'mk12345'
+create user TaiXe for login TaiXe
+
+grant select, update on DonHang to TaiXe
+
+-- Phân hệ nhân viên
+create login Nhanvien with Password = 'mk123'
+create user Nhanvien for login Nhanvien
+
+grant select on HopDong to Nhanvien
+
+--Phân hệ quản trị
+create login quantri with Password = 'mk123'
+
+ALTER SERVER ROLE [sysadmin] ADD MEMBER quantri
+
+create user quantri for login quantri
+
+ALTER USER quantri WITH DEFAULT_SCHEMA=[dbo];
+ALTER ROLE [db_owner] ADD MEMBER quantri
